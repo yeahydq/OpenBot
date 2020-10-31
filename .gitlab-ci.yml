@@ -1,0 +1,87 @@
+image: cirrusci/flutter:stable
+# image: registry.gitlab.com/yeahydq/flutter-docker
+stages:
+  - build
+  - deploy
+
+  # - analyze
+  # - test
+
+variables:
+  # Common
+  AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
+  AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
+  AWS_REGION: $AWS_REGION
+  S3_BUCKET_NAME: $S3_BUCKET_NAME
+
+
+build:
+  stage: build
+
+  # before_script:
+  #   - flutter pub get
+  #   - flutter clean
+
+  script:
+    # - flutter version v1.17.3 -y
+    # - flutter build apk
+    - cd android && ./gradlew assembleRelease
+
+  tags:
+    - shared
+
+  artifacts:
+    paths:
+    # - abc.txt
+    - android/build/app/outputs/apk/release/app-release.apk
+
+deploy:
+  stage: deploy
+  # when: manual
+  before_script:
+    # - sudo apt-get update && sudo apt-get install -y python3 python3-pip python3-setuptools
+    # - pip3 --no-cache-dir install --upgrade awscli
+    - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+    - unzip -qq awscliv2.zip
+    - sudo ./aws/install
+  script:
+      # - aws s3 cp build/ s3://$S3_BUCKET_NAME/ --recursive --include "*"
+      # - aws cloudfront create-invalidation --distribution-id $CDN_DISTRIBUTION_ID --paths "/*"
+    - aws s3 cp android/build/app/outputs/apk/release/app-release.apk s3://edu-app-release-jp/openbot.apk --region=ap-northeast-1
+    # - aws s3 cp abc.txt s3://edu-app-release-jp/Flutter-EduApp.apk --region=ap-northeast-1
+    - aws s3api put-object-acl --bucket edu-app-release-jp --key openbot.apk --acl public-read --region=ap-northeast-1
+  tags:
+    - shared
+# latest image download url: https://gitlab.com/yeahydq/Flutter-EduApp/-/jobs/artifacts/master/download?job=build
+
+# https://gitlab.com/yeahydq/Flutter-EduApp/-/jobs/artifacts/master/raw/app/outputs/apk/release/app-release.apk?job=build  => this not ok
+# https://gitlab.com/yeahydq/Flutter-EduApp/-/jobs/artifacts/master/download?job=build                                     => this seems ok
+
+
+
+  # only:
+  #   - merge_requests
+
+# unit_test:
+#   stage: test
+
+#   script:
+#     - flutter test test/*
+
+#   tags:
+#     - shared
+
+#   only:
+#     - 
+  
+# analyze:
+#   stage: analyze
+
+#   script:
+#     - echo job excluded
+
+#   tags:
+#   - shared
+
+#   only:
+#     - merge_requests

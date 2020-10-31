@@ -144,7 +144,7 @@ public abstract class CameraActivity extends AppCompatActivity
   private int baudRate = 115200;
   protected LogMode logMode = LogMode.CROP_IMG;
   protected ControlSpeed controlSpeed = ControlSpeed.NORMAL;
-  protected DriveMode driveMode = DriveMode.GAME;
+  protected DriveMode driveMode = DriveMode.JOYSTICK;
   protected String logFolder;
   private boolean loggingEnabled;
   private Intent intentSensorService;
@@ -594,7 +594,7 @@ public abstract class CameraActivity extends AppCompatActivity
         // This should help with legacy situations where using the camera2 API causes
         // distorted or otherwise broken previews.
         useCamera2API =
-            (facing == CameraCharacteristics.LENS_FACING_EXTERNAL)
+            (facing == CameraCharacteristics.LENS_FACING_BACK)
                 || isHardwareLevelSupported(
                     characteristics, CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_FULL)
                 || isHardwareLevelSupported(
@@ -864,6 +864,7 @@ public abstract class CameraActivity extends AppCompatActivity
     logFolder =
         Environment.getExternalStorageDirectory().getAbsolutePath()
             + File.separator
+            + "0_"
             + getString(R.string.app_name)
             + File.separator
             + new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
