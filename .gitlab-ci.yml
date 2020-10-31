@@ -33,7 +33,7 @@ build:
   artifacts:
     paths:
     # - abc.txt
-    - build/app/outputs/apk/release/app-release.apk
+    - android/app/build/app/outputs/apk/release/app-release.apk
 
 deploy:
   stage: deploy
@@ -47,7 +47,7 @@ deploy:
   script:
       # - aws s3 cp build/ s3://$S3_BUCKET_NAME/ --recursive --include "*"
       # - aws cloudfront create-invalidation --distribution-id $CDN_DISTRIBUTION_ID --paths "/*"
-    - aws s3 cp build/app/outputs/apk/release/app-release.apk s3://edu-app-release-jp/openbot.apk --region=ap-northeast-1
+    - aws s3 cp android/app/build/app/outputs/apk/release/app-release.apk s3://edu-app-release-jp/openbot.apk --region=ap-northeast-1
     # - aws s3 cp abc.txt s3://edu-app-release-jp/Flutter-EduApp.apk --region=ap-northeast-1
     - aws s3api put-object-acl --bucket edu-app-release-jp --key openbot.apk --acl public-read --region=ap-northeast-1
   tags:
